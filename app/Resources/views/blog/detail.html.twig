@@ -1,0 +1,43 @@
+{% extends ':blog:layout.html.twig' %}
+
+{% block body_layout %}
+
+    {% for message in app.session.flashbag.get('erreur') %}
+        <p class="alert alert-danger">{{ message }}</p>
+    {% endfor %}
+
+    <p>{{ article.titre}}</p>
+    <p>{{ article.contenu | raw}}</p>
+    <p>{{ article.date | date('d-m-Y')}}</p>
+
+
+    {% if article.image %}
+        <img src="{{ article.image.url }}" alt="{{ article.image.alt }}" >
+    {% endif %}
+
+    <p>Commentaires :</p>
+
+
+    {% for commentaire in article.commentaires %}
+        <p>{{ commentaire.contenu|e }}</p>
+    {% else %}
+        <p>Sans commentaire</p>
+    {% endfor %}
+
+    {% for tag in article.tags %}
+
+        <a href="{{ path('tag_blog', {id: tag.id}) }}"><span>{{tag.titre}}</span></a>
+
+
+    {% endfor %}
+
+
+    <a href="{{ path('supprimer_blog', {id : article.id}) }}"><p>Supprimer #{{article.id}}</p></a>
+
+
+
+
+{% endblock %}
+
+
+

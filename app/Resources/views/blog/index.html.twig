@@ -1,0 +1,37 @@
+{% extends ':blog:layout.html.twig' %}
+
+{% block title %}{{ parent()}} - Index{% endblock %}
+
+
+{% block body_layout %}
+
+
+    {% for message in app.session.flashbag.get('succes') %}
+        <p class="alert alert-success">{{ message }}</p>
+    {% endfor %}
+
+    <p>Page : {{ page }} </p>
+
+
+
+    {% for article in articles %}
+
+
+        <a href="{{ path("detail_blog",{id:article.id}) }}"><h2>Titre : {{ article.titre|e }}</h2>
+            <p>{{ article.contenu|e }}</p>
+            <p>Publication : {{ article.publication|e }}</p>
+            <p>{{ article.date|date }}</p>
+            <div>
+                {% if article.image %}
+                    <img src="{{ article.image.url }}" alt="{{ article.image.alt }}" >
+                {% endif %}
+            </div>
+        </a>
+    {% endfor %}
+
+
+
+
+{% endblock %}
+
+

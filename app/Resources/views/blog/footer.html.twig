@@ -1,0 +1,11 @@
+{% block body_layout %}
+
+    <ul>
+        {% for article in articles %}
+            <li>{{ article.titre|e }}</li>
+            <li>{{ article.contenu|e }}</li>
+            {% endfor %}
+    </ul>
+
+
+{% endblock %}
