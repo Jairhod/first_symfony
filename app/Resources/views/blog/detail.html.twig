@@ -2,6 +2,8 @@
 
 {% block body_layout %}
 
+
+
     {% for message in app.session.flashbag.get('erreur') %}
         <p class="alert alert-danger">{{ message }}</p>
     {% endfor %}
@@ -9,6 +11,7 @@
     {% for message in app.session.flashbag.get('succes') %}
         <p class="alert alert-success">{{ message }}</p>
     {% endfor %}
+
     <p>{{ article.titre}}</p>
     <p>{{ article.contenu | raw}}</p>
     <p>{{ article.date | date('d-m-Y')}}</p>
@@ -19,6 +22,10 @@
     {% endif %}
 
     <p>Commentaires :</p>
+
+    {{form_start(form)}}
+    {{form_widget(form)}}
+    {{form_end(form)}}
 
 
     {% for commentaire in article.commentaires %}
@@ -36,9 +43,6 @@
 
     <a href="{{ path('supprimer_blog', {id : article.id}) }}"><p>Supprimer #{{article.id}}</p></a>
     <a href="{{ path('modifier_blog', {id : article.id}) }}"><p>Modifier #{{article.id}}</p></a>
-
-
-
 
 {% endblock %}
 

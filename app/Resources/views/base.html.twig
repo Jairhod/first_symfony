@@ -37,17 +37,9 @@
                 <ul class="nav navbar-nav">
                     <li class="{% if app.request.attributes.get('_route') == 'homepage' %}active{% endif %}"><a href="{{ path('homepage') }}">Home</a></li>
                     <li class="{% if app.request.attributes.get('_route') == 'homepage_blog' %}active{% endif %}"><a href="{{ path('homepage_blog') }}">Blog</a></li>
-                    <li class="{% if app.request.attributes.get('_route') == 'catalogue_blog' %}active{% endif %}"><a href="{{ path('catalogue_blog') }}">Catalogue</a></li>
+                    <li class="{% if app.request.attributes.get('_route') == 'catalogue_homepage' %}active{% endif %}"><a href="{{ path('catalogue_homepage') }}">Catalogue</a></li>
                     <li class="{% if app.request.attributes.get('_route') == 'ajouter_blog' %}active{% endif %}"><a href="{{ path('ajouter_blog') }}">Ajouter</a></li>
                 </ul>
-                {#
-                                    <ul class="nav navbar-nav">
-                                        <li class="{% if app.request.attributes.get('_route') == 'homepage' %}active{% endif %}"><a href="{{path('homepage')}}">Home</a></li>
-                                        <li class="{% if app.request.attributes.get('_route') == 'homepage_blog' %}active{% endif %}"><a href="{{path('homepage_blog')}}">Blog</a></li>
-                                        <li class="{% if app.request.attributes.get('_route') == 'add_blog' %}active{% endif %}"><a href="{{path('add_blog')}}">Create an article</a></li>
-                                    </ul>
-
-                              #}
             </div><!--/.nav-collapse -->
         </div>
     </nav>
@@ -59,9 +51,9 @@
     </div><!-- /.container -->
 
     <footer class="footer">
-
-        {{ render(controller('AppBundle:Blog:footer', {nb:2} )) }}
-
+        <div class="container-fluid">
+            {{ render(controller('AppBundle:Blog:footer', {nb:2} )) }}
+        </div>
     </footer>
 
 
@@ -76,9 +68,6 @@
 {% block javascripts %}{% endblock %}
 </body>
 </html>
-
-
-
 
 
 {#<!DOCTYPE html>

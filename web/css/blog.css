@@ -9,16 +9,22 @@ and open the template in the editor.
 */
 
 body {
-    padding: 100px;
+    padding-top: 50px;
 
 }
 
 .footer {
-    background: pink;
+    background: lightgreen;
 
 }
 
 img {
 
     height: 150px;
+}
+
+#detail-article {
+    padding: 20px;
+    background-color: yellow;
+
 }

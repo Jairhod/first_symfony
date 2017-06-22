@@ -2,7 +2,6 @@
 
 {% block title %}{{ parent()}} - Index{% endblock %}
 
-
 {% block body_layout %}
 
 
@@ -12,24 +11,22 @@
 
     <p>Page : {{ page }} </p>
 
-
-
     {% for article in articles %}
 
+        <div class="col-lg-4">
+            <a href="{{ path("detail_blog",{id:article.id}) }}"><h2>Titre : {{ article.titre|e }}</h2>
+                <p>{{ article.contenu|e }}</p>
+                <p>Publication : {{ article.publication|e }}</p>
+                <p>{{ article.date|date }}</p>
+                <div>
+                    {% if article.image %}
+                        <img src="{{ article.image.url }}" alt="{{ article.image.alt }}" >
+                    {% endif %}
+                </div>
+            </a>
+        </div>
 
-        <a href="{{ path("detail_blog",{id:article.id}) }}"><h2>Titre : {{ article.titre|e }}</h2>
-            <p>{{ article.contenu|e }}</p>
-            <p>Publication : {{ article.publication|e }}</p>
-            <p>{{ article.date|date }}</p>
-            <div>
-                {% if article.image %}
-                    <img src="{{ article.image.url }}" alt="{{ article.image.alt }}" >
-                {% endif %}
-            </div>
-        </a>
     {% endfor %}
-
-
 
 
 {% endblock %}

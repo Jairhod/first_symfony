@@ -1,0 +1,23 @@
+{% extends ':catalogue:layout.html.twig' %}
+
+{% block body_layout %}
+
+    <p><strong>{{ produit.titre}}</strong></p>
+    <p>{{ produit.contenu | raw}}</p>
+    <p>{{ produit.date | date('d-m-Y')}}</p>
+
+
+    {% if produit.image %}
+        <img src="{{ produit.image.url }}" alt="{{ produit.image.alt }}" >
+    {% endif %}
+
+    {{form_start(form)}}
+    {{form_widget(form)}}
+    {{form_end(form)}}
+
+    {#
+        <a href="{{ path('supprimer_blog', {id : article.id}) }}"><p>Supprimer #{{article.id}}</p></a>
+        <a href="{{ path('modifier_blog', {id : article.id}) }}"><p>Modifier #{{article.id}}</p></a>
+    #}
+
+{% endblock %}

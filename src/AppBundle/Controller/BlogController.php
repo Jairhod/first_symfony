@@ -46,7 +46,7 @@ class BlogController extends Controller {
      * requirements={"id": "\d+"})
      *
      */
-    public function detailAction($id) {
+    public function detailAction(Request $request, $id) {
 
         //$article = ['id' => $id, 'titre' => 'Hello world', 'contenu' => 'Lorem <strong>lo rem</strong> rem lo', 'date' => new \DateTime];
 
@@ -56,13 +56,37 @@ class BlogController extends Controller {
 
         $article = $ar->getArticleByIdWithJoin($id);
 
+        $commentaire = new \AppBundle\Entity\Commentaire();
+        $commentaire->setArticle($article);
+
+        $form = $this->createForm(\AppBundle\Form\CommentaireType::class, $commentaire);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $session = $this->get('session');
+
+            try {
+                $em->persist($commentaire);
+                $em->flush();
+                $session->getFlashBag()
+                        ->add('succes', 'Commenté');
+                return $this->redirectToRoute('detail_blog', ['id' => $id]);
+            } catch (\Exception $e) {
+                $session->getFlashBag()
+                        ->add('erreur', 'Non commenté' . $e->getMessage() . $e->getFile());
+            }
+        }
+
+
         //$url = $article->getImage()->getUrl();
 //
 //        $cr = $em->getRepository('AppBundle:Commentaire');
 //
 //        $commentaires = $cr->findBy(['article' => $article]);
 
-        return $this->render('blog/detail.html.twig', ['article' => $article]);
+        return $this->render('blog/detail.html.twig', ['article' => $article, 'form' => $form->createView()]);
     }
 
     /**

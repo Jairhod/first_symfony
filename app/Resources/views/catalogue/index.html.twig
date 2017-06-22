@@ -1,0 +1,15 @@
+{% extends ':catalogue:layout.html.twig' %}
+
+{% block body_layout %}
+
+    {% for categorie in categories %}
+
+        <div class="col-lg-4">
+            <a href="{{ path("categorie_catalogue",{id:categorie.id}) }}"><h2>Categorie : {{ categorie.titre|e }}</h2>
+        </div>
+
+    {% endfor %}
+
+
+
+{% endblock %}
