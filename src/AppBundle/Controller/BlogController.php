@@ -2,8 +2,11 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Article;
+use AppBundle\Form\ArticleType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -94,54 +97,93 @@ class BlogController extends Controller {
     }
 
     /**
-     * @Route("/ajouter/{id}", name="ajouter_blog",
+     * @Route("/ajouter", name="ajouter_blog")
      *
-     * requirements={"id": "\d+"})
      *
      */
     public function ajouterAction(Request $request) {
 
-        $article = new \AppBundle\Entity\Article();
-        $article->setTitre('Hello World')
-                ->setContenu('Lorem em rem');
+        $article = new Article();
 
-        $image = new \AppBundle\Entity\Image();
-        $image->setUrl('https://robohash.org/' . rand() . '.png')
-                ->setAlt('robohash');
+        $form = $this->createForm(ArticleType::class, $article);
 
-        $comm1 = new \AppBundle\Entity\Commentaire();
-        $comm1->setContenu('Really good');
+        //Traitement formulaire
+        $form->handleRequest($request);
 
-        $comm2 = new \AppBundle\Entity\Commentaire();
-        $comm2->setContenu('Brilliant');
+        if ($form->isSubmitted() && $form->isValid()) {
 
-        $tag1 = new \AppBundle\Entity\Tag();
-        $tag1->setTitre('Marvin');
+            $em = $this->getDoctrine()->getManager();
+            $session = $this->get('session');
 
-        $tag2 = new \AppBundle\Entity\Tag();
-        $tag2->setTitre('R2D2');
+            try {
+                $em->persist($article);
+                $em->flush();
+                $session->getFlashBag()
+                        ->add('succes', 'Article ajouté');
+                $session->getFlashBag()
+                        ->add('succes', 'Bien, bien ajouté!');
+                return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
+            } catch (\Exception $e) {
+                $session->getFlashBag()
+                        ->add('erreur', 'Non ajouté' . $e->getMessage() . $e->getFile());
+            }
+        }
 
-        $tag3 = new \AppBundle\Entity\Tag();
-        $tag3->setTitre('Hal');
+        return $this->render('blog/ajouter.html.twig', ['form' => $form->createView()]);
 
-        $article->setImage($image);
-        $comm1->setArticle($article);
-        $comm2->setArticle($article);
-        $article->addTag($tag1);
-        $article->addTag($tag2);
-        $article->addTag($tag3);
 
-        $doctrine = $this->getDoctrine();
-        $em = $doctrine->getManager();
-
-        $em->persist($article);
-        $em->persist($comm1);
-        $em->persist($comm2);
-
-        $em->flush();
-
-        return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
-
+//        $formBuilder = $this->createFormBuilder($article);
+//
+//        $formBuilder->add('titre')
+//                ->add('contenu')
+//                ->add('date', DateType::class, array('widget' => 'single_text', 'html5' => false, 'format' => 'yyyy-MM-dd', 'attr' => ['class' => 'js-datepicker']))
+//                ->add('publication', null, ['required' => false, 'label' => 'Publié ?'])
+//                ->add('submit', \Symfony\Component\Form\Extension\Core\Type\SubmitType::class);
+//
+//        $form = $formBuilder->getForm();
+//
+//
+//        $article->setTitre('Hello World')
+//                ->setContenu('Lorem em rem');
+//
+//        $image = new \AppBundle\Entity\Image();
+//        $image->setUrl('https://robohash.org/' . rand() . '.png')
+//                ->setAlt('robohash');
+//
+//        $comm1 = new \AppBundle\Entity\Commentaire();
+//        $comm1->setContenu('Really good');
+//
+//        $comm2 = new \AppBundle\Entity\Commentaire();
+//        $comm2->setContenu('Brilliant');
+//
+//        $tag1 = new \AppBundle\Entity\Tag();
+//        $tag1->setTitre('Marvin');
+//
+//        $tag2 = new \AppBundle\Entity\Tag();
+//        $tag2->setTitre('R2D2');
+//
+//        $tag3 = new \AppBundle\Entity\Tag();
+//        $tag3->setTitre('Hal');
+//
+//        $article->setImage($image);
+//        $comm1->setArticle($article);
+//        $comm2->setArticle($article);
+//        $article->addTag($tag1);
+//        $article->addTag($tag2);
+//        $article->addTag($tag3);
+//
+//        $doctrine = $this->getDoctrine();
+//        $em = $doctrine->getManager();
+//
+//        $em->persist($article);
+//        $em->persist($comm1);
+//        $em->persist($comm2);
+//
+//        $em->flush();
+//
+//        return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
+//
+//
         // return $this->render('blog/ajouter.html.twig', ['id' => $id]);
     }
 
@@ -152,7 +194,31 @@ class BlogController extends Controller {
      *
      */
     public function modifierAction(Request $request, $id) {
-        return $this->render('blog/modifier.html.twig', ['id' => $id]);
+
+        $em = $this->getDoctrine()->getManager();
+        $article = $em->getRepository('AppBundle:Article')->find($id);
+        $form = $this->createForm(ArticleType::class, $article);
+        $session = $this->get('session');
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $em = $this->getDoctrine()->getManager();
+            $session = $this->get('session');
+
+            try {
+                $em->flush();
+                $session->getFlashBag()
+                        ->add('succes', 'Article Modifié');
+
+                return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
+            } catch (\Exception $e) {
+                $session->getFlashBag()
+                        ->add('erreur', 'Non Modifié' . $e->getMessage() . $e->getFile());
+            }
+        }
+
+        return $this->render('blog/modifier.html.twig', ['form' => $form->createView()]);
     }
 
     public function footerAction($nb) {
@@ -170,11 +236,29 @@ class BlogController extends Controller {
 
         $ar = $em->getRepository('AppBundle:Article');
 
-        $articles = $ar->findBy(['publication' => true], ['date' => 'DESC', 'titre' => 'ASC'], $nb);
+        //$articles = $ar->findBy(['publication' => true], ['date' => 'DESC', 'titre' => 'ASC'], $nb);
+        $articles = $ar->getLatestArticles($nb);
+        $years = $ar->getCurrentYear();
 
 
         // replace this example code with whatever you need
-        return $this->render('blog/footer.html.twig', ['nb' => $nb, 'articles' => $articles]);
+        return $this->render('blog/footer.html.twig', ['years' => $years, 'articles' => $articles]);
+    }
+
+    /**
+     * @Route("/archive/{year}", name="year_articles",
+     *
+     * requirements={"year": "\d+"})
+     *
+     */
+    public function yearAction($year) {
+
+        $em = $this->getDoctrine()->getManager();
+        $ar = $em->getRepository('AppBundle:Article');
+
+        $articles = $ar->getArticlesByYear($year);
+
+        return $this->render('blog/year.html.twig', ['year' => $year, 'articles' => $articles]);
     }
 
     /**

@@ -1,12 +1,19 @@
-<h2>{{ tag.titre }}</h2>
-<h2>{{ count }}</h2>
+{% extends ':blog:layout.html.twig' %}
+
+{% block body_layout %}
+
+    <h2>{{ tag.titre }}</h2>
+    <h2>{{ count }}</h2>
 
 
-{% for article in articles %}
+    {% for article in articles %}
 
-    <span>Titre : {{article.titre}} #id {{article.id}}</span>
+        <p>Titre : {{article.titre}} #id {{article.id}}</p>
 
-{% endfor %}
+    {% endfor %}
+
+
+{% endblock %}
 
 
 

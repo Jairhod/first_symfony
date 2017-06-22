@@ -1,11 +1,23 @@
+
 {% block body_layout %}
 
-    <ul>
-        {% for article in articles %}
-            <li>{{ article.titre|e }}</li>
-            <li>{{ article.contenu|e }}</li>
-            {% endfor %}
+    <h3>Titres</h3>
+
+    {% for article in articles %}
+        <p><a href="#">#{{ article.id|e }} - {{ article.titre|e }}</a></p>
+
+    {% endfor %}
+    <h3>Archives</h3>
+
+    <ul class='list-unstyled'>
+        {% for year in years %}
+            <li>
+                <a href= '{{path("year_articles",{year:year[1]})}}'>
+                    <p>{{ year[1]}}</p>
+                </a>
+            </li>
+        {% endfor %}
     </ul>
 
-
 {% endblock %}
+

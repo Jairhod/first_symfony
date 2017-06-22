@@ -1,1 +1,26 @@
-je suis un formulaire
+{% form_theme form 'bootstrap_3_layout.html.twig' 'ckeditor.html.twig' %}
+{#{% form_theme form 'bootstrap_3_layout.html.twig' 'ckeditor.html.twig' %}#}
+
+
+{% form_theme form 'ckeditor.html.twig' %}
+
+{{ form_start(form)}}
+
+{#{{ form_widget(form)}}#}
+
+{#{{ form_label(form.titre)}}#}
+
+
+{{ form_label(form.titre, 'Donner un titre') }}
+{{ form_errors(form.titre)}}
+{{ form_widget(form.titre)}}
+
+
+
+{{ form_widget(form.date, { 'attr':{'class':'js-datepicker'} } ) }}
+
+
+
+
+
+{{ form_end(form)}}

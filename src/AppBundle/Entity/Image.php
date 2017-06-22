@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Image
@@ -10,8 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="image")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\ImageRepository")
  */
-class Image
-{
+class Image {
+
     /**
      * @var int
      *
@@ -23,7 +24,14 @@ class Image
 
     /**
      * @var string
-     *
+     * 
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 20,
+     *      minMessage = "Your first name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+     * )
+     *     *
      * @ORM\Column(name="alt", type="string", length=255)
      */
     private $alt;
@@ -35,14 +43,12 @@ class Image
      */
     private $url;
 
-
     /**
      * Get id
      *
      * @return int
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -51,10 +57,10 @@ class Image
      *
      * @param string $alt
      *
+
      * @return Image
      */
-    public function setAlt($alt)
-    {
+    public function setAlt($alt) {
         $this->alt = $alt;
 
         return $this;
@@ -65,8 +71,7 @@ class Image
      *
      * @return string
      */
-    public function getAlt()
-    {
+    public function getAlt() {
         return $this->alt;
     }
 
@@ -77,8 +82,7 @@ class Image
      *
      * @return Image
      */
-    public function setUrl($url)
-    {
+    public function setUrl($url) {
         $this->url = $url;
 
         return $this;
@@ -89,9 +93,8 @@ class Image
      *
      * @return string
      */
-    public function getUrl()
-    {
+    public function getUrl() {
         return $this->url;
     }
-}
 
+}

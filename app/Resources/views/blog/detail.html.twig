@@ -6,6 +6,9 @@
         <p class="alert alert-danger">{{ message }}</p>
     {% endfor %}
 
+    {% for message in app.session.flashbag.get('succes') %}
+        <p class="alert alert-success">{{ message }}</p>
+    {% endfor %}
     <p>{{ article.titre}}</p>
     <p>{{ article.contenu | raw}}</p>
     <p>{{ article.date | date('d-m-Y')}}</p>
@@ -28,11 +31,11 @@
 
         <a href="{{ path('tag_blog', {id: tag.id}) }}"><span>{{tag.titre}}</span></a>
 
-
     {% endfor %}
 
 
     <a href="{{ path('supprimer_blog', {id : article.id}) }}"><p>Supprimer #{{article.id}}</p></a>
+    <a href="{{ path('modifier_blog', {id : article.id}) }}"><p>Modifier #{{article.id}}</p></a>
 
 
 

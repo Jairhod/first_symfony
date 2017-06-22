@@ -1,0 +1,20 @@
+{% extends ':blog:layout.html.twig' %}
+
+{% block body_layout %}
+
+    <h3>Year : {{year}}</h3>
+
+    {% if article.image.url is defined %}
+
+        {% for article in articles %}
+
+            <h2>{{ article.titre|e }}</h2>
+            <img src="{{ article.image.url }}" alt="{{ article.image.alt }}" >
+            <p>{{ article.contenu|e }}</p>
+
+        {% endfor %}
+
+
+    {% endif %}
+
+{% endblock %}

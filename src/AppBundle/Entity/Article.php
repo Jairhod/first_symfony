@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Article
@@ -24,12 +25,22 @@ class Article {
     /**
      * @var string
      *
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 50,
+     *      minMessage = "Your first name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+     * )
+     *
      * @ORM\Column(name="titre", type="string", length=255)
      */
     private $titre;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
+     * message ="Entrez un contenu"
      *
      * @ORM\Column(name="contenu", type="text")
      */
@@ -51,6 +62,8 @@ class Article {
 
     /**
      * @var Image
+     *
+     * @Assert\Valid
      *
      * @ORM\OneToOne(targetEntity="Image", cascade={"persist", "remove"})
      *

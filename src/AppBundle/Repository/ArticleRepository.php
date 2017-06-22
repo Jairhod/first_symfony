@@ -74,9 +74,59 @@ class ArticleRepository extends \Doctrine\ORM\EntityRepository {
                 ->setParameter(1, $tag)
                 ->orderBy('a.date', 'DESC');
 
-
-
         return $qb->getQuery()->getSingleScalarResult();
     }
 
+    public function getLatestArticles($limit) {
+
+        $qb = $this->createQueryBuilder('a');
+        $qb->where('a.publication = 1')
+                ->orderBy('a.date', 'DESC')
+                ->setMaxResults($limit);
+
+        $query = $qb->getQuery();
+        $articles = $query->getArrayResult();
+
+
+        return $articles;
+    }
+
+    public function getArticlesByYear($year) {
+        $debut = $year . '-01-01';
+        $fin = $year . '-12-31';
+
+        $qb = $this->createQueryBuilder('a');
+        $qb->where('a.date>= ?1 AND a.date<= ?2 ')
+                ->setParameter(1, $debut)
+                ->setParameter(2, $fin)
+                ->orderBy('a.date', 'DESC');
+
+        $query = $qb->getQuery();
+        $articles = $query->getResult();
+
+
+        return $articles;
+    }
+
+    public function getCurrentYear($limit = 5) {
+        if ((int) $limit) {
+            return $this->createQueryBuilder('a')
+                            ->select('SUBSTRING(a.date,1,4)')
+                            ->distinct()
+                            ->orderBy('a.date', 'DESC')
+                            ->setMaxResults($limit)
+                            ->getQuery()
+                            ->getResult();
+        }
+        return null;
+    }
+
+    //
+//    public function getCurrentYear() {
+//
+//        $year = date("Y");
+//
+//        return $year;
+//    }
+//
 }
