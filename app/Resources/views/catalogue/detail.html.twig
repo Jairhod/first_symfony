@@ -11,6 +11,14 @@
         <img src="{{ produit.image.url }}" alt="{{ produit.image.alt }}" >
     {% endif %}
 
+    <p id="notes-catalogue"><strong>Notes :</strong>
+
+        {% for note in produit.notes %}
+            <span>{{ note.valeur }}</span>
+        {% endfor %}
+
+    </p>
+
     {{form_start(form)}}
     {{form_widget(form)}}
     {{form_end(form)}}
@@ -19,5 +27,42 @@
         <a href="{{ path('supprimer_blog', {id : article.id}) }}"><p>Supprimer #{{article.id}}</p></a>
         <a href="{{ path('modifier_blog', {id : article.id}) }}"><p>Modifier #{{article.id}}</p></a>
     #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{parent()}}
+    <script>
+        $('form[name=appbundle_note]').submit(
+                function (e) {
+                    e.preventDefault();
+                    $('#erreur-ajax-catalogue').remove();
+                    $('form[name=appbundle_note] button').addClass('disabled').attr('disabled', true);
+                    $.ajax({
+                        url: '{{path('ajax_note_catalogue')}}',
+                        method: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id:{{produit.id}} ,
+                            valeur: $('#appbundle_note_valeur').val()
+                        },
+                        error: function () {
+                            alert('Erreur ajout note');
+                        },
+                        success: function (data) {
+                            $('form[name=appbundle_note] button').removeClass('disabled').attr('disabled', false);
+                            if (data.success) {
+                                $('#notes-catalogue').append(
+                                        '<span>' + ' ' + data.note.valeur + '</span>');
+                            } else {
+                                $('form[name=aappbundle_note] button').after('<p id="erreur-ajax-catalogue" class="alert alert-danger">There is a problem</p>')
+                            }
+                        }
+                    });
+                });
+    </script>
+
+
+
 
 {% endblock %}

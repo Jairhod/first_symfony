@@ -3,11 +3,16 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Article;
+use AppBundle\Entity\Commentaire;
 use AppBundle\Form\ArticleType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use AppBundle\Form\CommentaireType;
+use Exception;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/blog")
@@ -56,29 +61,10 @@ class BlogController extends Controller {
 
         $article = $ar->getArticleByIdWithJoin($id);
 
-        $commentaire = new \AppBundle\Entity\Commentaire();
+        $commentaire = new Commentaire();
         $commentaire->setArticle($article);
 
-        $form = $this->createForm(\AppBundle\Form\CommentaireType::class, $commentaire);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $session = $this->get('session');
-
-            try {
-                $em->persist($commentaire);
-                $em->flush();
-                $session->getFlashBag()
-                        ->add('succes', 'Commenté');
-                return $this->redirectToRoute('detail_blog', ['id' => $id]);
-            } catch (\Exception $e) {
-                $session->getFlashBag()
-                        ->add('erreur', 'Non commenté' . $e->getMessage() . $e->getFile());
-            }
-        }
-
+        $form = $this->createForm(CommentaireType::class, $commentaire, ['action' => $this->generateUrl('ajouter_commentaire_blog', ['id' => $id])]);
 
         //$url = $article->getImage()->getUrl();
 //
@@ -87,6 +73,78 @@ class BlogController extends Controller {
 //        $commentaires = $cr->findBy(['article' => $article]);
 
         return $this->render('blog/detail.html.twig', ['article' => $article, 'form' => $form->createView()]);
+    }
+
+    /**
+     * @Method({"POST"})
+     * @Route("/ajouter_commentaire_blog/{id}", name="ajouter_commentaire_blog",
+     *
+     * requirements={"id": "\d+"})
+     *
+     */
+    public function ajouterCommentaireAction(Request $request, Article $article) {
+
+        $commentaire = new Commentaire();
+        $commentaire->setArticle($article);
+
+        $form = $this->createForm(CommentaireType::class, $commentaire);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $session = $this->get('session');
+            $em->persist($commentaire);
+
+            try {
+                $em->flush();
+                $session->getFlashBag()
+                        ->add('succes', 'Commenté');
+                return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
+            } catch (Exception $e) {
+                $session->getFlashBag()
+                        ->add('erreur', 'Non commenté ' . $e->getMessage() . $e->getFile());
+            }
+        }
+    }
+
+    /**
+     *
+     * @Route("/ajax_commentaire_blog", name="ajax_commentaire_blog")
+     *
+     *
+     */
+    public function ajouterAjaxCommentaireAction(Request $request) {
+
+        if ($request->isXmlHttpRequest()) {
+            $id = $request->request->get('id');
+            $contenu = $request->request->get('contenu');
+
+            $em = $this->getDoctrine()->getManager();
+            $ar = $em->getRepository('AppBundle:Article');
+            $article = $ar->find($id);
+            $commentaire = new Commentaire();
+            $commentaire->setArticle($article);
+            $commentaire->setContenu($contenu);
+            $em->persist($commentaire);
+
+            try {
+                $em->flush();
+                return new JsonResponse(
+                        ['success' => true,
+                    'commentaire' => ['id' => $commentaire->getId(),
+                        'contenu' => $commentaire->getContenu(),
+                        'date' => $commentaire->getDate()->format('Y-m-d'),
+                    ]
+                ]);
+            } catch (Exception $e) {
+                return new JsonResponse(['success' => false]);
+            }
+
+            return new JsonResponse();
+        } else {
+            throw new HttpException(403);
+        }
     }
 
     /**
@@ -147,7 +205,7 @@ class BlogController extends Controller {
                 $session->getFlashBag()
                         ->add('succes', 'Bien, bien ajouté!');
                 return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $session->getFlashBag()
                         ->add('erreur', 'Non ajouté' . $e->getMessage() . $e->getFile());
             }
@@ -236,7 +294,7 @@ class BlogController extends Controller {
                         ->add('succes', 'Article Modifié');
 
                 return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $session->getFlashBag()
                         ->add('erreur', 'Non Modifié' . $e->getMessage() . $e->getFile());
             }

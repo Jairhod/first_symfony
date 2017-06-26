@@ -2,8 +2,6 @@
 
 {% block body_layout %}
 
-
-
     {% for message in app.session.flashbag.get('erreur') %}
         <p class="alert alert-danger">{{ message }}</p>
     {% endfor %}
@@ -12,27 +10,34 @@
         <p class="alert alert-success">{{ message }}</p>
     {% endfor %}
 
-    <p>{{ article.titre}}</p>
-    <p>{{ article.contenu | raw}}</p>
-    <p>{{ article.date | date('d-m-Y')}}</p>
 
 
-    {% if article.image %}
-        <img src="{{ article.image.url }}" alt="{{ article.image.alt }}" >
-    {% endif %}
+    <div id="detail-article">
 
-    <p>Commentaires :</p>
+        <p>{{ article.titre}}</p>
+        <p>{{ article.contenu | raw}}</p>
+        <p>{{ article.date | date('d-m-Y')}}</p>
+
+        {% if article.image %}
+            <img src="{{ article.image.url }}" alt="{{ article.image.alt }}" >
+        {% endif %}
+        <p>Commentaires :</p>
+        <div id="commentaires">
+
+            {% for commentaire in article.commentaires %}
+                <p> {{ commentaire.date | date('Y-m-d') }} - {{ commentaire.contenu|e }}</p>
+            {% else %}
+                <p>Sans commentaire</p>
+            {% endfor %}
+        </div>
+    </div>
 
     {{form_start(form)}}
-    {{form_widget(form)}}
+    {{form_widget(form)}}<img src="{{ asset('images/ajax-loader.gif')  }}" style = "display:none" id="loading" />
     {{form_end(form)}}
 
 
-    {% for commentaire in article.commentaires %}
-        <p>{{ commentaire.contenu|e }}</p>
-    {% else %}
-        <p>Sans commentaire</p>
-    {% endfor %}
+
 
     {% for tag in article.tags %}
 
@@ -43,6 +48,48 @@
 
     <a href="{{ path('supprimer_blog', {id : article.id}) }}"><p>Supprimer #{{article.id}}</p></a>
     <a href="{{ path('modifier_blog', {id : article.id}) }}"><p>Modifier #{{article.id}}</p></a>
+
+{% endblock %}
+
+{% block javascripts %}
+
+
+    <script>
+        $('form[name=appbundle_commentaire]').submit(
+                function (e) {
+                    $('#erreur-ajax').remove();
+                    e.preventDefault();
+                    $('#loading').show();
+                    $('form[name=appbundle_commentaire] button').addClass('disabled').attr('disabled', true);
+                    $.ajax({
+                        url: '{{path('ajax_commentaire_blog')}}',
+                        method: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id:{{article.id}} ,
+                            contenu: $('form[name=appbundle_commentaire] textarea').val()
+                        },
+                        error: function () {
+                            alert('erreur');
+                        },
+                        success: function (data) {
+                            $('#loading').hide();
+                            $('form[name=appbundle_commentaire] button').removeClass('disabled').attr('disabled', false);
+                            if (data.success) {
+                                $('#commentaires').prepend(
+                                        '<p>' + data.commentaire.date + ' - ' + data.commentaire.contenu + '</p>');
+                            } else {
+                                $('form[name=appbundle_commentaire] button').after('<p id="erreur-ajax" class="alert alert-danger">There is a problem</p>')
+                            }
+                            $('#appbundle_commentaire_contenu').val('');
+
+                        }
+                    });
+                });
+    </script>
+
+
+
 
 {% endblock %}
 

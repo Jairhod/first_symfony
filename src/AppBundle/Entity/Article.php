@@ -2,12 +2,14 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Article
  *
+ * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="article")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\ArticleRepository")
  */
@@ -47,11 +49,18 @@ class Article {
     private $contenu;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(name="date", type="datetime")
      */
     private $date;
+
+    /**
+     * @var DateTime
+     *
+     * @ORM\Column(name="date_modification", type="datetime")
+     */
+    private $dateModification;
 
     /**
      * @var boolean
@@ -74,7 +83,7 @@ class Article {
     //@ORM\JoinColumn(nullable=false)
 
     /**
-     * @var \Doctrine\Common\Collections\ArrayCollection
+     * @var ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="Tag", cascade={"persist"}, inversedBy="articles")
      *
@@ -82,7 +91,7 @@ class Article {
     private $tags;
 
     /**
-     * @var \Doctrine\Common\Collections\ArrayCollection
+     * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="Commentaire", mappedBy="article", cascade={"remove"})
      * @ORM\OrderBy({"date"="DESC"})
@@ -145,7 +154,7 @@ class Article {
     /**
      * Set date
      *
-     * @param \DateTime $date
+     * @param DateTime $date
      *
      * @return Article
      */
@@ -158,7 +167,7 @@ class Article {
     /**
      * Get date
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getDate() {
         return $this->date;
@@ -189,11 +198,11 @@ class Article {
     /**
      * Set image
      *
-     * @param \AppBundle\Entity\Image $image
+     * @param Image $image
      *
      * @return Article
      */
-    public function setImage(\AppBundle\Entity\Image $image = null) {
+    public function setImage(Image $image = null) {
         $this->image = $image;
 
         return $this;
@@ -202,7 +211,7 @@ class Article {
     /**
      * Get image
      *
-     * @return \AppBundle\Entity\Image
+     * @return Image
      */
     public function getImage() {
         return $this->image;
@@ -211,11 +220,11 @@ class Article {
     /**
      * Add tag
      *
-     * @param \AppBundle\Entity\Tag $tag
+     * @param Tag $tag
      *
      * @return Article
      */
-    public function addTag(\AppBundle\Entity\Tag $tag) {
+    public function addTag(Tag $tag) {
         $this->tags[] = $tag;
 
         return $this;
@@ -224,16 +233,16 @@ class Article {
     /**
      * Remove tag
      *
-     * @param \AppBundle\Entity\Tag $tag
+     * @param Tag $tag
      */
-    public function removeTag(\AppBundle\Entity\Tag $tag) {
+    public function removeTag(Tag $tag) {
         $this->tags->removeElement($tag);
     }
 
     /**
      * Get tags
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getTags() {
         return $this->tags;
@@ -243,20 +252,21 @@ class Article {
      * Constructor
      */
     public function __construct() {
-        $this->tags = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->commentaires = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->date = new \DateTime;
+        $this->tags = new ArrayCollection();
+        $this->commentaires = new ArrayCollection();
+        $this->date = new DateTime;
+        $this->dateModification = new DateTime;
         $this->publication = true;
     }
 
     /**
      * Add commentaire
      *
-     * @param \AppBundle\Entity\Commentaire $commentaire
+     * @param Commentaire $commentaire
      *
      * @return Article
      */
-    public function addCommentaire(\AppBundle\Entity\Commentaire $commentaire) {
+    public function addCommentaire(Commentaire $commentaire) {
         $this->commentaires[] = $commentaire;
 
         return $this;
@@ -265,19 +275,48 @@ class Article {
     /**
      * Remove commentaire
      *
-     * @param \AppBundle\Entity\Commentaire $commentaire
+     * @param Commentaire $commentaire
      */
-    public function removeCommentaire(\AppBundle\Entity\Commentaire $commentaire) {
+    public function removeCommentaire(Commentaire $commentaire) {
         $this->commentaires->removeElement($commentaire);
     }
 
     /**
      * Get commentaires
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getCommentaires() {
         return $this->commentaires;
+    }
+
+    /**
+     * Set dateModification
+     *
+     * @param DateTime $dateModification
+     *
+     * @return Article
+     */
+    public function setDateModification($dateModification) {
+        $this->dateModification = $dateModification;
+
+        return $this;
+    }
+
+    /**
+     * Get dateModification
+     *
+     * @return DateTime
+     */
+    public function getDateModification() {
+        return $this->dateModification;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function updateDateModification() {
+        $this->setDateModification(new \DateTime);
     }
 
 }

@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Article
@@ -24,12 +25,22 @@ class Article {
     /**
      * @var string
      *
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 50,
+     *      minMessage = "Your first name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+     * )
+     *
      * @ORM\Column(name="titre", type="string", length=255)
      */
     private $titre;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank
+     * message ="Entrez un contenu"
      *
      * @ORM\Column(name="contenu", type="text")
      */
@@ -43,6 +54,13 @@ class Article {
     private $date;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="date_modification", type="datetime")
+     */
+    private $dateModification;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="publication", type="boolean")
@@ -51,6 +69,8 @@ class Article {
 
     /**
      * @var Image
+     *
+     * @Assert\Valid
      *
      * @ORM\OneToOne(targetEntity="Image", cascade={"persist", "remove"})
      *
@@ -72,7 +92,7 @@ class Article {
      * @var \Doctrine\Common\Collections\ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="Commentaire", mappedBy="article", cascade={"remove"})
-     *
+     * @ORM\OrderBy({"date"="DESC"})
      */
     private $commentaires;
 
@@ -231,8 +251,40 @@ class Article {
      */
     public function __construct() {
         $this->tags = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->commentaires = new \Doctrine\Common\Collections\ArrayCollection();
         $this->date = new \DateTime;
         $this->publication = true;
+    }
+
+    /**
+     * Add commentaire
+     *
+     * @param \AppBundle\Entity\Commentaire $commentaire
+     *
+     * @return Article
+     */
+    public function addCommentaire(\AppBundle\Entity\Commentaire $commentaire) {
+        $this->commentaires[] = $commentaire;
+
+        return $this;
+    }
+
+    /**
+     * Remove commentaire
+     *
+     * @param \AppBundle\Entity\Commentaire $commentaire
+     */
+    public function removeCommentaire(\AppBundle\Entity\Commentaire $commentaire) {
+        $this->commentaires->removeElement($commentaire);
+    }
+
+    /**
+     * Get commentaires
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getCommentaires() {
+        return $this->commentaires;
     }
 
 }

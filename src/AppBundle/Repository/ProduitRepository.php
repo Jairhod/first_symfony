@@ -44,4 +44,16 @@ class ProduitRepository extends \Doctrine\ORM\EntityRepository {
         return $query->getOneOrNullResult();
     }
 
+    public function getLatestProduit($limit) {
+
+        $qb = $this->createQueryBuilder('p');
+        $qb->orderBy('p.date', 'DESC')
+                ->setMaxResults($limit);
+
+        $query = $qb->getQuery();
+        $produits = $query->getArrayResult();
+
+        return $produits;
+    }
+
 }

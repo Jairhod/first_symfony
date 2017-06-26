@@ -66,6 +66,14 @@ class Produit {
     private $image;
 
     /**
+     * @var \Doctrine\Common\Collections\ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Note", mappedBy="produit", cascade={"remove"})
+     *
+     */
+    private $notes;
+
+    /**
      * Get id
      *
      * @return int
@@ -160,6 +168,50 @@ class Produit {
      */
     public function getDate() {
         return $this->date;
+    }
+
+    /**
+     * Set categorie
+     *
+     * @param \AppBundle\Entity\Categorie $categorie
+     *
+     * @return Produit
+     */
+    public function setCategorie(\AppBundle\Entity\Categorie $categorie) {
+        $this->categorie = $categorie;
+
+        return $this;
+    }
+
+    /**
+     * Get categorie
+     *
+     * @return \AppBundle\Entity\Categorie
+     */
+    public function getCategorie() {
+        return $this->categorie;
+    }
+
+    /**
+     * Set image
+     *
+     * @param \AppBundle\Entity\Image $image
+     *
+     * @return Produit
+     */
+    public function setImage(\AppBundle\Entity\Image $image = null) {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * Get image
+     *
+     * @return \AppBundle\Entity\Image
+     */
+    public function getImage() {
+        return $this->image;
     }
 
 }
