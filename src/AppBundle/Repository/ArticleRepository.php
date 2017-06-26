@@ -38,8 +38,8 @@ class ArticleRepository extends \Doctrine\ORM\EntityRepository {
                 ->orderBy('a.date', 'DESC');
 
         $query = $qb->getQuery();
-        $articles = $query->getArrayResult();
-
+        //   $articles = $query->getArrayResult();
+        $articles = $query->getResult();
 
         return $articles;
     }

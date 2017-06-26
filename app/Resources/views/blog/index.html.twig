@@ -14,8 +14,9 @@
     {% for article in articles %}
 
         <div class="col-lg-4">
-            <a href="{{ path("detail_blog",{id:article.id}) }}"><h2>Titre : {{ article.titre|e }}</h2>
-                <p>{{ article.contenu|e }}</p>
+            <a href="{{ path("detail_blog",{id:article.id}) }}"><h2>{{ article.titre|e }}</h2>
+                {#                <p>{{ article.contenu|e }}</p>#}
+                <p>{{ article.extrait| raw }}</p>
                 <p>Publication : {{ article.publication|e }}</p>
                 <p>{{ article.date|date }}</p>
                 <div>

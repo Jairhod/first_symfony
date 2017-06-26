@@ -49,6 +49,21 @@ class Article {
     private $contenu;
 
     /**
+     * @var string
+     *
+     */
+    private $extrait;
+
+    public function getExtrait() {
+        return $this->extrait;
+    }
+
+    public function setExtrait($extrait) {
+        $this->extrait = $extrait;
+        return $this;
+    }
+
+    /**
      * @var DateTime
      *
      * @ORM\Column(name="date", type="datetime")
@@ -254,8 +269,8 @@ class Article {
     public function __construct() {
         $this->tags = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
-        $this->date = new DateTime;
-        $this->dateModification = new DateTime;
+        $this->date = new \DateTime;
+        $this->dateModification = new \DateTime;
         $this->publication = true;
     }
 

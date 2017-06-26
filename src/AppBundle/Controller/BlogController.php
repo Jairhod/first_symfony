@@ -6,6 +6,8 @@ use AppBundle\Entity\Article;
 use AppBundle\Entity\Commentaire;
 use AppBundle\Form\ArticleType;
 use AppBundle\Form\CommentaireType;
+use AppBundle\Service\Extrait;
+use AppBundle\Service\ExtraitWithLink;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -24,7 +26,7 @@ class BlogController extends Controller {
      * defaults={"p": 1},
      * requirements={"p": "\d+"})
      */
-    public function indexAction(Request $request, $p) {
+    public function indexAction(Request $request, Extrait $extrait, ExtraitWithLink $extraitWithLink, $p) {
 
 //
 //        $articles = [
@@ -40,7 +42,9 @@ class BlogController extends Controller {
 
         $articles = $ar->getArticles();
 
-
+        foreach ($articles as $article)
+            $article->setExtrait($extraitWithLink->get($article));
+//            $article->setExtrait($extrait->get($article->getContenu()));
         // replace this example code with whatever you need
         return $this->render('blog/index.html.twig', ['page' => $p, 'articles' => $articles]);
     }

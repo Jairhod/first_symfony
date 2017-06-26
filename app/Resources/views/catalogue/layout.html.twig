@@ -36,7 +36,7 @@
 
 {% block javascripts %}
     <script>
-        $('#myModal').on('show.bs.modal', function (e) {
+        $('#myModal').on('show.bs.modal', function () {
 
             $.ajax({
                 url: '{{path('ajax_nvx_prod')}}',
