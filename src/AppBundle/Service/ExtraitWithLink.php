@@ -30,11 +30,9 @@ class ExtraitWithLink {
         if (strlen($text) >= $this->max) {
             $text = substr($text, 0, $this->max);
             $text = substr($text, 0, strrpos($text, " "));
+            $url = $this->router->generate('detail_blog', ['id' => $article->getId()]);
+            $text .= ' <a href="' . $url . '">... [Lire la suite]</a>';
         }
-
-        $url = $this->router->generate('detail_blog', ['id' => $article->getId()]);
-
-        $text .= ' <a href="' . $url . '"Lire la suite</a>';
 
         return $text;
     }

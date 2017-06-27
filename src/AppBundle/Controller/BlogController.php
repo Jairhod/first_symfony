@@ -28,14 +28,6 @@ class BlogController extends Controller {
      */
     public function indexAction(Request $request, Extrait $extrait, ExtraitWithLink $extraitWithLink, $p) {
 
-//
-//        $articles = [
-//                ['id' => 1, 'titre' => 'Hello world', 'contenu' => 'Lorem <strong>lo rem</strong> rem lo', 'date' => new \DateTime],
-//                ['id' => 2, 'titre' => 'Hello world', 'contenu' => 'Lorem <strong>lo rem</strong> rem lo', 'date' => new \DateTime],
-//                ['id' => 3, 'titre' => 'Hello world', 'contenu' => 'Lorem <strong>lo rem</strong> rem lo', 'date' => new \DateTime],
-//        ];
-//
-
         $em = $this->getDoctrine()->getManager();
 
         $ar = $em->getRepository('AppBundle:Article');
@@ -45,7 +37,6 @@ class BlogController extends Controller {
         foreach ($articles as $article)
             $article->setExtrait($extraitWithLink->get($article));
 //            $article->setExtrait($extrait->get($article->getContenu()));
-        // replace this example code with whatever you need
         return $this->render('blog/index.html.twig', ['page' => $p, 'articles' => $articles]);
     }
 
