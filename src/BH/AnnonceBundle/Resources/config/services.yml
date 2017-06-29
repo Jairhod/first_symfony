@@ -1,0 +1,4 @@
+services:
+#    bh_annonce.example:
+#        class: BH\AnnonceBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]

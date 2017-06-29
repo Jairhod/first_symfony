@@ -9,22 +9,45 @@
         <p class="alert alert-success">{{ message }}</p>
     {% endfor %}
 
-    <p>Page : {{ page }} </p>
+
+    <nav aria-label="...">
+        <ul class="pagination">
+
+            <li class="page-item {% if (page_active == 1) %}disabled{% endif %}">
+                <a class="page-link" href="{% if (page_active > 1) %}{{ path('homepage_blog', {p: page_active-1})}}{% endif %}"  >Previous</a>
+            </li>
+
+            {% for i in 1..pages %}
+
+                <li class="page-item {% if (i == page_active) %}active{% endif %}">
+                    <a class="page-link" href="{{ path('homepage_blog', {p: i})}}">{{ i }} <span class="sr-only">(current)</span></a>
+                </li>
+            {% endfor %}
+
+            {% if (page_active<pages) %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ path('homepage_blog', {p: page_active+1})}}" >Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
 
     {% for article in articles %}
 
         <div class="col-lg-4">
-            <a href="{{ path("detail_blog",{id:article.id}) }}"><h2>{{ article.titre|e }}</h2>
-                {#                <p>{{ article.contenu|e }}</p>#}
-                <p>{{ article.extrait| raw }}</p>
-                <p>Publication : {{ article.publication|e }}</p>
-                <p>{{ article.date|date }}</p>
-                <div>
-                    {% if article.image %}
-                        <img src="{{ article.image.url }}" alt="{{ article.image.alt }}" >
-                    {% endif %}
-                </div>
-            </a>
+            <a href="{{ path("detail_blog",{id:article.id}) }}"><h2>{{ article.titre|e }}</h2></a>
+            {#                <p>{{ article.contenu|e }}</p>#}
+            {#                <p>{{ article.extrait| raw }}</p>#}
+            {#            <p>{{ extrait(article.contenu) }}</p>#}
+            <p>{{ article.contenu | extrait }}</p>
+            <p>Publication : {{ article.publication|e }}</p>
+            <p>{{ article.date|date }}</p>
+            <div>
+                {% if article.image %}
+                    <img src="{{ article.image.url }}" alt="{{ article.image.alt }}" >
+                {% endif %}
+            </div>
+
         </div>
 
     {% endfor %}

@@ -1,3 +1,15 @@
+app_tag:
+    resource: "@AppBundle/Controller/TagController.php"
+    type:     annotation
+
+bh_annonce:
+    resource: "@BHAnnonceBundle/Controller/"
+    type:     annotation
+    prefix:   /annonce
+
 app:
     resource: '@AppBundle/Controller/'
     type: annotation
+
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"

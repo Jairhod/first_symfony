@@ -38,7 +38,9 @@
                     <li class="{% if app.request.attributes.get('_route') == 'homepage' %}active{% endif %}"><a href="{{ path('homepage') }}">Home</a></li>
                     <li class="{% if app.request.attributes.get('_route') == 'homepage_blog' %}active{% endif %}"><a href="{{ path('homepage_blog') }}">Blog</a></li>
                     <li class="{% if app.request.attributes.get('_route') == 'catalogue_homepage' %}active{% endif %}"><a href="{{ path('catalogue_homepage') }}">Catalogue</a></li>
-                    <li class="{% if app.request.attributes.get('_route') == 'ajouter_blog' %}active{% endif %}"><a href="{{ path('ajouter_blog') }}">Ajouter</a></li>
+                    {% if is_granted('ROLE_ADMIN') %}<li class="{% if app.request.attributes.get('_route') == 'ajouter_blog' %}active{% endif %}"><a href="{{ path('ajouter_blog') }}">Ajouter</a></li>{% endif %}
+
+
                 </ul>
             </div><!--/.nav-collapse -->
         </div>

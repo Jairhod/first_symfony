@@ -3,6 +3,7 @@
 parameters:
     suite: ' [...]'
     max: 150
+    item_par_page: 3
 
 services:
     # default configuration for services in *this* file
@@ -39,3 +40,15 @@ services:
     AppBundle\Service\ExtraitWithLink:
         arguments:
             $max: '%max%'
+
+    AppBundle\Twig\ExtraitTwig:
+        arguments:
+            $max: '%max%'
+            $suite: '%suite%'
+
+    app.maintenance:
+        class: AppBundle\Listener\MaintenanceListener
+        arguments:
+            $actif: false
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }

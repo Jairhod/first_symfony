@@ -28,16 +28,27 @@ class BlogController extends Controller {
      */
     public function indexAction(Request $request, Extrait $extrait, ExtraitWithLink $extraitWithLink, $p) {
 
+        //$page_active = $p;
+        $limit = $this->getParameter('item_par_page');
+        $offset = (int) ($limit * ($p - 1));
+
         $em = $this->getDoctrine()->getManager();
-
         $ar = $em->getRepository('AppBundle:Article');
+        $articles = $ar->getArticlesWithPagination($offset, $limit);
+        $nb_articles = $articles->count();
+        $nb_pages = ceil($nb_articles / $limit);
 
-        $articles = $ar->getArticles();
 
-        foreach ($articles as $article)
-            $article->setExtrait($extraitWithLink->get($article));
+
+
+
+        //       $articles = $ar->getArticles();
+        //   foreach ($articles as $article)
+        //     $article->setExtrait($extraitWithLink->get($article));
 //            $article->setExtrait($extrait->get($article->getContenu()));
-        return $this->render('blog/index.html.twig', ['page' => $p, 'articles' => $articles]);
+
+
+        return $this->render('blog/index.html.twig', ['pages' => $nb_pages, 'page_active' => $p, 'articles' => $articles]);
     }
 
     /**
@@ -344,19 +355,24 @@ class BlogController extends Controller {
      * requirements={"id": "\d+"})
      *
      */
-    public function tagAction($id) {
+    public function tagAction(Request $request, $id) {
 
         $em = $this->getDoctrine()->getManager();
 
         $ar = $em->getRepository('AppBundle:Article');
         $tr = $em->getRepository('AppBundle:Tag');
 
-        $articles = $ar->getArticlesByTagWithJoin($id);
+        $query = $ar->getArticlesByTagWithJoin($id);
+        $paginator = $this->get('knp_paginator');
+        $pagination = $paginator->paginate(
+                $query, $request->query->getInt('page', 1), 2
+        );
+
         $tag = $tr->find($id);
 
         $count = $ar->getCountByTag($tag);
 
-        return $this->render('blog/tag.html.twig', ['tag' => $tag, 'articles' => $articles, 'count' => $count]);
+        return $this->render('blog/tag.html.twig', ['tag' => $tag, 'pagination' => $pagination, 'count' => $count]);
     }
 
 }

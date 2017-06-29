@@ -44,6 +44,23 @@ class ArticleRepository extends \Doctrine\ORM\EntityRepository {
         return $articles;
     }
 
+    public function getArticlesWithPagination($offset, $limit) {
+        $qb = $this->createQueryBuilder('a');
+        $qb->leftJoin('a.image', 'i')
+                ->addSelect('i')
+                ->leftJoin('a.tags', 't')
+                ->addSelect('t')
+                ->orderBy('a.date', 'DESC')
+                ->where('a.publication = true')
+                ->setFirstResult($offset)
+                ->setMaxResults($limit)
+        ;
+
+        $query = $qb->getQuery();
+
+        return new \Doctrine\ORM\Tools\Pagination\Paginator($query);
+    }
+
     public function getArticlesByTagWithJoin($tag) {
         $qb = $this->createQueryBuilder('a');
         $qb->leftJoin('a.image', 'i')
@@ -57,11 +74,9 @@ class ArticleRepository extends \Doctrine\ORM\EntityRepository {
                 ->setParameter(1, $tag)
                 ->orderBy('a.date', 'DESC');
 
-        $query = $qb->getQuery();
-        $articles = $query->getArrayResult();
-
-
-        return $articles;
+        return $query = $qb->getQuery();
+        //   $articles = $query->getArrayResult();
+        //  return $articles;
     }
 
     public function getCountByTag($tag) {
