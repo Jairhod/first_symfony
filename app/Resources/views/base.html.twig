@@ -39,6 +39,9 @@
                     <li class="{% if app.request.attributes.get('_route') == 'homepage_blog' %}active{% endif %}"><a href="{{ path('homepage_blog') }}">Blog</a></li>
                     <li class="{% if app.request.attributes.get('_route') == 'catalogue_homepage' %}active{% endif %}"><a href="{{ path('catalogue_homepage') }}">Catalogue</a></li>
                     {% if is_granted('ROLE_ADMIN') %}<li class="{% if app.request.attributes.get('_route') == 'ajouter_blog' %}active{% endif %}"><a href="{{ path('ajouter_blog') }}">Ajouter</a></li>{% endif %}
+                    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}<li><a>| Hey {{ app.user }}. You are awesome !</a></li>
+                        <li class="{% if app.request.attributes.get('_route') == 'fos_user_security_logout' %}active{% endif %}"><a href="{{ path('fos_user_security_logout') }}">Logout</a></li>
+                    {% else %}<li class="{% if app.request.attributes.get('_route') == 'fos_user_security_login' %}active{% endif %}"><a href="{{ path('fos_user_security_login') }}">Login</a></li>{% endif %}
 
 
                 </ul>

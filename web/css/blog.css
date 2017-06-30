@@ -9,11 +9,12 @@ and open the template in the editor.
 */
 
 body {
-    padding-top: 50px;
+    padding-top: 100px;
 
 }
 
 .footer {
+    margin-top: 20px;
     background: lightgreen;
 }
 
@@ -21,7 +22,7 @@ img {
     width: 15em;
 }
 
-#detail-article {
+.detail-article {
 
     background-color: yellow;
     margin-left: auto;

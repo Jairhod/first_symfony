@@ -41,6 +41,14 @@ class Commentaire {
     private $article;
 
     /**
+     * @var User
+     *
+     * @ORM\ManyToOne (targetEntity="User")
+     *
+     */
+    private $user;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="date", type="datetime")

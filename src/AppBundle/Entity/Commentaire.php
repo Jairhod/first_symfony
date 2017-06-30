@@ -41,6 +41,14 @@ class Commentaire {
     private $article;
 
     /**
+     * @var User
+     *
+     * @ORM\ManyToOne (targetEntity="User")
+     *
+     */
+    private $user;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="date", type="datetime")
@@ -122,4 +130,28 @@ class Commentaire {
         return $this->article;
     }
 
+
+    /**
+     * Set user
+     *
+     * @param \AppBundle\Entity\User $user
+     *
+     * @return Commentaire
+     */
+    public function setUser(\AppBundle\Entity\User $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \AppBundle\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 }

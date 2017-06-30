@@ -10,6 +10,7 @@ use AppBundle\Service\Extrait;
 use AppBundle\Service\ExtraitWithLink;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,6 +71,7 @@ class BlogController extends Controller {
         $commentaire = new Commentaire();
         $commentaire->setArticle($article);
 
+
         $form = $this->createForm(CommentaireType::class, $commentaire, ['action' => $this->generateUrl('ajouter_commentaire_blog', ['id' => $id])]);
 
         //$url = $article->getImage()->getUrl();
@@ -106,7 +108,7 @@ class BlogController extends Controller {
                 $em->flush();
                 $session->getFlashBag()
                         ->add('succes', 'Commenté');
-                return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
+                return $this->redirectToRoute('detail_blog', ['user' => $user, 'id' => $article->getId()]);
             } catch (Exception $e) {
                 $session->getFlashBag()
                         ->add('erreur', 'Non commenté ' . $e->getMessage() . $e->getFile());
@@ -125,6 +127,7 @@ class BlogController extends Controller {
         if ($request->isXmlHttpRequest()) {
             $id = $request->request->get('id');
             $contenu = $request->request->get('contenu');
+            $user = $this->getUser();
 
             $em = $this->getDoctrine()->getManager();
             $ar = $em->getRepository('AppBundle:Article');
@@ -132,6 +135,7 @@ class BlogController extends Controller {
             $commentaire = new Commentaire();
             $commentaire->setArticle($article);
             $commentaire->setContenu($contenu);
+            $commentaire->setUser($user);
             $em->persist($commentaire);
 
             try {
@@ -141,6 +145,7 @@ class BlogController extends Controller {
                     'commentaire' => ['id' => $commentaire->getId(),
                         'contenu' => $commentaire->getContenu(),
                         'date' => $commentaire->getDate()->format('Y-m-d'),
+                        'user' => $user->getUsername(),
                     ]
                 ]);
             } catch (Exception $e) {
@@ -185,12 +190,14 @@ class BlogController extends Controller {
     }
 
     /**
-     * @Route("/ajouter", name="ajouter_blog")
+     * @Security("has_role('ROLE_ADMIN')")
      *
+     * @Route("/ajouter", name="ajouter_blog")     *
      *
      */
     public function ajouterAction(Request $request) {
-
+//        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Bugger Off!');
+        $user = $this->getUser();
         $article = new Article();
 
         $form = $this->createForm(ArticleType::class, $article);
@@ -202,7 +209,7 @@ class BlogController extends Controller {
 
             $em = $this->getDoctrine()->getManager();
             $session = $this->get('session');
-
+            $article->setUser($user);
             try {
                 $em->persist($article);
                 $em->flush();
@@ -276,13 +283,15 @@ class BlogController extends Controller {
     }
 
     /**
+     * @Security("is_granted('ROLE_SUPER_ADMIN') or user == art.getUser()")
      * @Route("/modifier/{id}", name="modifier_blog",
      *
      * requirements={"id": "\d+"})
      *
      */
-    public function modifierAction(Request $request, $id) {
+    public function modifierAction(Request $request, $id, Article $art) {
 
+        $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
         $article = $em->getRepository('AppBundle:Article')->find($id);
         $form = $this->createForm(ArticleType::class, $article);
@@ -293,6 +302,7 @@ class BlogController extends Controller {
 
             $em = $this->getDoctrine()->getManager();
             $session = $this->get('session');
+            $article->setUser($user);
 
             try {
                 $em->flush();

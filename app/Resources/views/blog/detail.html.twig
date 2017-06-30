@@ -12,9 +12,10 @@
 
 
 
-    <div id="detail-article">
+    <div class="detail-article">
 
         <p>{{ article.titre}}</p>
+        <p>Ecrit par: {{ article.user}}</p>
         <p>{{ article.contenu | raw}}</p>
         <p>{{ article.date | date('d-m-Y')}}</p>
 
@@ -25,7 +26,7 @@
         <div id="commentaires">
 
             {% for commentaire in article.commentaires %}
-                <p> {{ commentaire.date | date('Y-m-d') }} - {{ commentaire.contenu|e }}</p>
+                <p> {{ commentaire.date | date('Y-m-d') }} - {{ commentaire.contenu|e }} - <strong> {{ commentaire.user|e }}</strong></p>
             {% else %}
                 <p>Sans commentaire</p>
             {% endfor %}
@@ -45,9 +46,10 @@
 
     {% endfor %}
 
-
-    <a href="{{ path('supprimer_blog', {id : article.id}) }}"><p>Supprimer #{{article.id}}</p></a>
-    <a href="{{ path('modifier_blog', {id : article.id}) }}"><p>Modifier #{{article.id}}</p></a>
+    {% if (is_granted('ROLE_SUPER_ADMIN') or (app.user==article.user and (is_granted('ROLE_ADMIN') )) ) %}
+        <a href="{{ path('supprimer_blog', {id : article.id}) }}"><p>Supprimer #{{article.id}}</p></a>
+        <a href="{{ path('modifier_blog', {id : article.id}) }}"><p>Modifier #{{article.id}}</p></a>
+    {% endif %}
 
 {% endblock %}
 
@@ -77,7 +79,7 @@
                             $('form[name=appbundle_commentaire] button').removeClass('disabled').attr('disabled', false);
                             if (data.success) {
                                 $('#commentaires').prepend(
-                                        '<p>' + data.commentaire.date + ' - ' + data.commentaire.contenu + '</p>');
+                                        '<p>' + data.commentaire.date + ' - ' + data.commentaire.contenu + ' - ' + '<strong>' + data.commentaire.user + '<strong></p>');
                             } else {
                                 $('form[name=appbundle_commentaire] button').after('<p id="erreur-ajax" class="alert alert-danger">There is a problem</p>')
                             }
