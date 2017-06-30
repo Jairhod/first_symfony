@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="first_symfony">
+    <serverData>
+      <paths name="first_symfony">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="first_symfony" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
