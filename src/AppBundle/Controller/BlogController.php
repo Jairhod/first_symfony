@@ -29,7 +29,6 @@ class BlogController extends Controller {
      */
     public function indexAction(Request $request, Extrait $extrait, ExtraitWithLink $extraitWithLink, $p) {
 
-        //$page_active = $p;
         $limit = $this->getParameter('item_par_page');
         $offset = (int) ($limit * ($p - 1));
 
@@ -39,55 +38,36 @@ class BlogController extends Controller {
         $nb_articles = $articles->count();
         $nb_pages = ceil($nb_articles / $limit);
 
-
-
-
-
-        //       $articles = $ar->getArticles();
-        //   foreach ($articles as $article)
-        //     $article->setExtrait($extraitWithLink->get($article));
-//            $article->setExtrait($extrait->get($article->getContenu()));
-
-
         return $this->render('blog/index.html.twig', ['pages' => $nb_pages, 'page_active' => $p, 'articles' => $articles]);
     }
 
     /**
-     * @Route("/detail/{id}", name="detail_blog",
+     * @Route("/detail/{slug}", name="detail_blog",
      *
-     * requirements={"id": "\d+"})
+     * requirements={"slug": "[a-z0-9\-]+$"})
      *
      */
-    public function detailAction(Request $request, $id) {
-
-        //$article = ['id' => $id, 'titre' => 'Hello world', 'contenu' => 'Lorem <strong>lo rem</strong> rem lo', 'date' => new \DateTime];
+    public function detailAction(Request $request, $slug) {
 
         $em = $this->getDoctrine()->getManager();
 
         $ar = $em->getRepository('AppBundle:Article');
 
-        $article = $ar->getArticleByIdWithJoin($id);
+        $article = $ar->getArticleBySlugWithJoin($slug);
 
         $commentaire = new Commentaire();
         $commentaire->setArticle($article);
 
-
-        $form = $this->createForm(CommentaireType::class, $commentaire, ['action' => $this->generateUrl('ajouter_commentaire_blog', ['id' => $id])]);
-
-        //$url = $article->getImage()->getUrl();
-//
-//        $cr = $em->getRepository('AppBundle:Commentaire');
-//
-//        $commentaires = $cr->findBy(['article' => $article]);
+        $form = $this->createForm(CommentaireType::class, $commentaire, ['action' => $this->generateUrl('ajouter_commentaire_blog', ['slug' => $slug])]);
 
         return $this->render('blog/detail.html.twig', ['article' => $article, 'form' => $form->createView()]);
     }
 
     /**
      * @Method({"POST"})
-     * @Route("/ajouter_commentaire_blog/{id}", name="ajouter_commentaire_blog",
+     * @Route("/ajouter_commentaire_blog/{slug}", name="ajouter_commentaire_blog",
      *
-     * requirements={"id": "\d+"})
+     * requirements={"slug": "[a-z0-9\-]+$"})
      *
      */
     public function ajouterCommentaireAction(Request $request, Article $article) {
@@ -108,7 +88,7 @@ class BlogController extends Controller {
                 $em->flush();
                 $session->getFlashBag()
                         ->add('succes', 'Commenté');
-                return $this->redirectToRoute('detail_blog', ['user' => $user, 'id' => $article->getId()]);
+                return $this->redirectToRoute('detail_blog', ['user' => $user, 'slug' => $article->getSlug()]);
             } catch (Exception $e) {
                 $session->getFlashBag()
                         ->add('erreur', 'Non commenté ' . $e->getMessage() . $e->getFile());
@@ -185,7 +165,7 @@ class BlogController extends Controller {
         } catch (Exception $e) {
             $session->getFlashBag()
                     ->add('erreur', 'Non supprimé' . $e->getMessage() . $e->getFile());
-            return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
+            return $this->redirectToRoute('detail_blog', ['slug' => $article->getSlug()]);
         }
     }
 
@@ -210,6 +190,12 @@ class BlogController extends Controller {
             $em = $this->getDoctrine()->getManager();
             $session = $this->get('session');
             $article->setUser($user);
+
+            $uploadableManager = $this->get('stof_doctrine_extensions.uploadable.manager');
+            $image = $article->getImage();
+            if ($image)
+            $uploadableManager->markEntityToUpload($image, $image->getUrl());
+
             try {
                 $em->persist($article);
                 $em->flush();
@@ -217,7 +203,7 @@ class BlogController extends Controller {
                         ->add('succes', 'Article ajouté');
                 $session->getFlashBag()
                         ->add('succes', 'Bien, bien ajouté!');
-                return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
+                return $this->redirectToRoute('detail_blog', ['slug' => $article->getSlug()]);
             } catch (Exception $e) {
                 $session->getFlashBag()
                         ->add('erreur', 'Non ajouté' . $e->getMessage() . $e->getFile());
@@ -309,7 +295,7 @@ class BlogController extends Controller {
                 $session->getFlashBag()
                         ->add('succes', 'Article Modifié');
 
-                return $this->redirectToRoute('detail_blog', ['id' => $article->getId()]);
+                return $this->redirectToRoute('detail_blog', ['slug' => $article->getSlug()]);
             } catch (Exception $e) {
                 $session->getFlashBag()
                         ->add('erreur', 'Non Modifié' . $e->getMessage() . $e->getFile());

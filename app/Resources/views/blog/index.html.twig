@@ -35,10 +35,7 @@
     {% for article in articles %}
 
         <div class="col-lg-4">
-            <a href="{{ path("detail_blog",{id:article.id}) }}"><h2>{{ article.titre|e }}</h2></a>
-                    {#                <p>{{ article.contenu|e }}</p>#}
-                    {#                <p>{{ article.extrait| raw }}</p>#}
-                    {#            <p>{{ extrait(article.contenu) }}</p>#}
+            <a href="{{ path("detail_blog",{slug:article.slug}) }}"><h2>{{ article.titre|e }}</h2></a>
             <p>Ecrit par: {{ article.user}}</p>
             <p>{{ article.contenu | extrait }}</p>
             <p>Publication : {{ article.publication|e }}</p>

@@ -21,7 +21,7 @@ class MaintenanceListener {
     private $templating;
     private $actif;
 
-    public function __construct(\Symfony\Bundle\TwigBundle\TwigEngine $templating, $actif) {
+    public function __construct(\Symfony\Component\Templating\EngineInterface $templating, $actif) {
         $this->templating = $templating;
         $this->actif = $actif;
     }

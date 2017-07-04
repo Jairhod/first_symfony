@@ -19,7 +19,7 @@ class Extrait {
     private $max;
     private $suite;
 
-    public function __construct(\Symfony\Component\HttpFoundation\Session\Session $session, $max, $suite) {
+    public function __construct(\Symfony\Component\HttpFoundation\Session\SessionInterface $session, $max, $suite) {
         $this->session = $session;
         $this->max = $max;
         $this->suite = $suite;

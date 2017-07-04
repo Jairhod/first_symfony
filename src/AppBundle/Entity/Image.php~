@@ -13,7 +13,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Table(name="image")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\ImageRepository")
  * @Gedmo\Uploadable(filenameGenerator="ALPHANUMERIC",
- *     callback="myCallbackMethod",
  *     allowOverwrite=false,
  *     appendNumber=true,
  *     allowedTypes="image/jpeg,image/png,image/gif,image/svg+xml",
@@ -21,15 +20,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *
  */
 class Image {
-
-    public function myCallbackMethod(array $info)
-    {
-        // Do some stuff with the file..
-    }
-
-    public function baseUrl(){
-        return basename($this->url);
-    }
 
     /**
      * @var int
@@ -121,28 +111,4 @@ class Image {
         return $this->url;
     }
 
-
-    /**
-     * Set name
-     *
-     * @param string $name
-     *
-     * @return Image
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Get name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
 }
