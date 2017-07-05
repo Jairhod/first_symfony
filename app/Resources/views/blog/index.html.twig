@@ -42,7 +42,7 @@
             <p>{{ article.date|date }}</p>
             <div>
                 {% if article.image %}
-                    <img src="{{ article.image.url }}" alt="{{ article.image.alt }}" >
+                    <img src="{{ asset('uploads/')~article.image.baseUrl }}" alt="{{ article.image.alt }}" >
                 {% endif %}
             </div>
 

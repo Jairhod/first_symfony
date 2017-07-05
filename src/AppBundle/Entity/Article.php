@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-
+use Gedmo\Translatable\Translatable;
 
 /**
  * Article
@@ -16,8 +16,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="article")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\ArticleRepository")
+ *
+ * @Gedmo\TranslationEntity(class="AppBundle\Entity\ArticleTraduction")
+ *
+ *
  */
-class Article {
+class Article implements Translatable {
 
     /**
      * @var int
@@ -45,6 +49,8 @@ class Article {
      * )
      *
      * @ORM\Column(name="titre", type="string", length=255)
+     * @Gedmo\Translatable
+     *
      */
     private $titre;
 
@@ -55,6 +61,8 @@ class Article {
      * message ="Entrez un contenu"
      *
      * @ORM\Column(name="contenu", type="text")
+     * @Gedmo\Translatable
+     *
      */
     private $contenu;
 
@@ -130,6 +138,17 @@ class Article {
      * @ORM\OrderBy({"date"="DESC"})
      */
     private $commentaires;
+
+    /**
+     * @Gedmo\Locale
+     * Used locale to override Translation listener`s locale
+     * this is not a mapped field of entity metadata, just a simple property
+     */
+    private $locale;
+
+    public function setTranslatableLocale($locale) {
+        $this->locale = $locale;
+    }
 
     /**
      * Get id
@@ -352,7 +371,6 @@ class Article {
         $this->setDateModification(new \DateTime);
     }
 
-
     /**
      * Set user
      *
@@ -360,8 +378,7 @@ class Article {
      *
      * @return Article
      */
-    public function setUser(\AppBundle\Entity\User $user = null)
-    {
+    public function setUser(\AppBundle\Entity\User $user = null) {
         $this->user = $user;
 
         return $this;
@@ -372,8 +389,7 @@ class Article {
      *
      * @return \AppBundle\Entity\User
      */
-    public function getUser()
-    {
+    public function getUser() {
         return $this->user;
     }
 
@@ -384,8 +400,7 @@ class Article {
      *
      * @return Article
      */
-    public function setSlug($slug)
-    {
+    public function setSlug($slug) {
         $this->slug = $slug;
 
         return $this;
@@ -396,8 +411,8 @@ class Article {
      *
      * @return string
      */
-    public function getSlug()
-    {
+    public function getSlug() {
         return $this->slug;
     }
+
 }

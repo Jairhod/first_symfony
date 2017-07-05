@@ -18,7 +18,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/blog")
+ * @Route("/{_locale}/blog"), defaults={"_locale": "fr"},
+ * requirements={"_locale": "fr|en"})
  */
 class BlogController extends Controller {
 
@@ -34,7 +35,8 @@ class BlogController extends Controller {
 
         $em = $this->getDoctrine()->getManager();
         $ar = $em->getRepository('AppBundle:Article');
-        $articles = $ar->getArticlesWithPagination($offset, $limit);
+
+        $articles = $ar->getArticlesWithPagination($offset, $limit, $request->getLocale());
         $nb_articles = $articles->count();
         $nb_pages = ceil($nb_articles / $limit);
 
@@ -150,6 +152,8 @@ class BlogController extends Controller {
 
         $article = $em->getRepository('AppBundle:Article')->find($id);
 
+        $article->getImage()->getUrl();
+
         $em->remove($article);
 
         $session = $this->get('session');
@@ -177,6 +181,11 @@ class BlogController extends Controller {
      */
     public function ajouterAction(Request $request) {
 //        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Bugger Off!');
+
+        if ($request->getLocale() != $this->getParameter('locale')) {
+            return $this->redirectToRoute('ajouter_blog', ['_locale' => $this->getParameter('locale')]);
+        }
+
         $user = $this->getUser();
         $article = new Article();
 
@@ -193,9 +202,12 @@ class BlogController extends Controller {
 
             $uploadableManager = $this->get('stof_doctrine_extensions.uploadable.manager');
             $image = $article->getImage();
-            if ($image)
-            $uploadableManager->markEntityToUpload($image, $image->getUrl());
 
+            if ($request->files->get($form->getName())['image']['url']) {
+                $image->setUrl($request->files->get($form->getName())['image']['url']);
+
+                $uploadableManager->markEntityToUpload($image, $image->getUrl());
+            }
             try {
                 $em->persist($article);
                 $em->flush();
@@ -285,11 +297,20 @@ class BlogController extends Controller {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $em = $this->getDoctrine()->getManager();
             $session = $this->get('session');
             $article->setUser($user);
+            $uploadableManager = $this->get('stof_doctrine_extensions.uploadable.manager');
+            $image = $article->getImage();
 
+            $url = $request->files->get($form->getName())['image']['url'];
+
+            if ($url) {
+                if (is_file($image->getUrl()))
+                    unlink($image->getUrl());
+                $image->setUrl($url);
+                $uploadableManager->markEntityToUpload($image, $image->getUrl());
+            }
             try {
                 $em->flush();
                 $session->getFlashBag()
@@ -306,15 +327,6 @@ class BlogController extends Controller {
     }
 
     public function footerAction($nb) {
-
-//
-//        $articles = [
-//                ['id' => 1, 'titre' => 'Hello world', 'contenu' => 'Lorem <strong>lo rem</strong> rem lo', 'date' => new \DateTime],
-//                ['id' => 2, 'titre' => 'Hello world', 'contenu' => 'Lorem <strong>lo rem</strong> rem lo', 'date' => new \DateTime],
-//                ['id' => 3, 'titre' => 'Hello world', 'contenu' => 'Lorem <strong>lo rem</strong> rem lo', 'date' => new \DateTime],
-//        ];
-//
-//
 
         $em = $this->getDoctrine()->getManager();
 
@@ -369,6 +381,17 @@ class BlogController extends Controller {
         $count = $ar->getCountByTag($tag);
 
         return $this->render('blog/tag.html.twig', ['tag' => $tag, 'pagination' => $pagination, 'count' => $count]);
+    }
+
+    /**
+     * @Route("/traduction", name="trad_blog")
+     */
+    public function traductionAction() {
+
+        $message = $this->get('translator')->trans('message');
+        $date = new \DateTime;
+
+        return $this->render('blog/traduction.html.twig', ['messageController' => $message, 'date' => $date]);
     }
 
 }

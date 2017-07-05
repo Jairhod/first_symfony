@@ -60,7 +60,7 @@ class ArticleRepository extends \Doctrine\ORM\EntityRepository {
         return $articles;
     }
 
-    public function getArticlesWithPagination($offset, $limit) {
+    public function getArticlesWithPagination($offset, $limit, $locale) {
         $qb = $this->createQueryBuilder('a');
         $qb->leftJoin('a.image', 'i')
                 ->addSelect('i')
@@ -73,6 +73,17 @@ class ArticleRepository extends \Doctrine\ORM\EntityRepository {
         ;
 
         $query = $qb->getQuery();
+        $query->setHint(
+                \Doctrine\ORM\Query::HINT_CUSTOM_OUTPUT_WALKER, 'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+        );
+        // locale
+        $query->setHint(
+                \Gedmo\Translatable\TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale // take locale from session or request etc.
+        );
+
+        $query->setHint(
+                \Gedmo\Translatable\TranslatableListener::HINT_INNER_JOIN, true);
+
 
         return new \Doctrine\ORM\Tools\Pagination\Paginator($query);
     }
